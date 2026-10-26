@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student CGPA Management System</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+    <div class="app">
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <h2>CGPA Manager</h2>
+            <nav>
+                <a href="/" class="active">Dashboard</a>
+                <a href="#student-info">Student Records</a>
+                <a href="#subjects">Course Grades</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms of Service</a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>Institutional DBMS Portal</p>
+                <p class="status-indicator">System Status: Operational</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Layout -->
+        <main class="main-content">
+
+            <header>
+                <h1>Student Academic Record &amp; CGPA Computation System</h1>
+                <p>Official institutional database application for managing student enrollments, course evaluations, and calculating semester and cumulative grade point averages.</p>
+            </header>
+
+            <!-- Student Profile Information -->
+            <section class="student-card" id="student-info">
+                <h2>Student Information</h2>
+
+                <div class="search-box">
+                    <h3>Search Student Record:</h3>
+                    <input type="text" id="searchUID" placeholder="Enter Student UID (e.g. 21CS101, 24BEC1440)">
+                    <button type="button" id="searchButton" onclick="searchStudent()">Search</button>
+                    <button type="button" onclick="clearForm()" class="btn-secondary">New Record</button>
+                </div>
+
+                <div class="student-form">
+                    <input type="text" id="studentName" placeholder="Full Legal Name">
+                    <input type="text" id="studentUID" placeholder="University ID (e.g. 25BEC11404)">
+                    <input type="text" id="studentBranch" placeholder="Department / Branch">
+
+                    <select id="semesterSelect" onchange="changeSemester()">
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4" selected>Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                        <option value="7">Semester 7</option>
+                        <option value="8">Semester 8</option>
+                    </select>
+
+                    <button type="button" onclick="saveStudent()" class="btn-success">Save Record</button>
+                </div>
+            </section>
+
+            <!-- Performance Metrics -->
+            <section class="stats" id="reports">
+                <div class="stat-card">
+                    <h3>Selected Semester SGPA</h3>
+                    <p id="sgpa">0.00</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Overall Cumulative CGPA</h3>
+                    <p id="cgpa">0.00</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Total Credits Completed</h3>
+                    <p id="totalCredits">0</p>
+                </div>
+            </section>
+
+            <!-- Subject Details & Grades -->
+            <section class="student-card" id="subjects">
+                <h2>Course Evaluation &amp; Grade Entry</h2>
+                <p class="section-desc">
+                    Register academic courses for the active semester. Grade point calculations follow the standard 10-point university evaluation model.
+                </p>
+
+                <div class="student-form">
+                    <input type="text" id="subjectName" placeholder="Course Title (e.g. Database Systems)">
+                    <input type="number" id="credits" placeholder="Course Credits (1 to 6)" min="1" max="6" value="4">
+                    <input type="number" id="gradePoint" placeholder="Grade Point (0 to 10)" min="0" max="10" step="1" value="9">
+                    <button type="button" onclick="addSubject()" class="btn-primary">Add Course</button>
+                </div>
+
+                <div id="subjectList">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Course Title</th>
+                                <th>Credits</th>
+                                <th>Letter Grade</th>
+                                <th>Grade Point</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectTableBody">
+                            <tr>
+                                <td colspan="4" class="text-muted text-center">
+                                    No courses registered for this semester.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="action-bar">
+                    <button type="button" class="btn-compute" onclick="calculateSGPA()">
+                        Compute SGPA and Cumulative CGPA
+                    </button>
+                </div>
+            </section>
+
+            <footer class="app-footer">
+                <div class="footer-links">
+                    <a href="/privacy">Privacy Policy</a>
+                    <a href="/terms">Terms of Service</a>
+                </div>
+                <p>&copy; 2026 Academic CGPA Management System. All institutional rights reserved.</p>
+            </footer>
+
+        </main>
+
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+</html>

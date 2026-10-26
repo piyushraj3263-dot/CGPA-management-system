@@ -1,0 +1,30 @@
+{
+  "name": "cgpa-management-system",
+  "version": "1.0.0",
+  "description": "Student CGPA Management System with Dual Database Architecture (Oracle Cloud & Local SQLite)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "cgpa",
+    "sgpa",
+    "academic-management",
+    "college-project",
+    "oracle-database",
+    "sqlite",
+    "express"
+  ],
+  "author": "College Student",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "oracledb": "^7.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
