@@ -15,9 +15,12 @@
         <aside class="sidebar">
             <h2>CGPA Manager</h2>
             <nav>
-                <a href="/" class="active">Dashboard</a>
-                <a href="#student-info">Student Records</a>
+                <a href="#student-info" class="active">Student Records</a>
+                <a href="#visual-analytics">Visual Analytics</a>
                 <a href="#subjects">Course Grades</a>
+                <a href="#honors-audit">Academic Regulations</a>
+                <a href="#converter">Percentage Converter</a>
+                <a href="#student-directory">Enrolled Directory</a>
                 <a href="/privacy">Privacy Policy</a>
                 <a href="/terms">Terms of Service</a>
             </nav>
@@ -30,9 +33,16 @@
         <!-- Main Content Layout -->
         <main class="main-content">
 
-            <header>
-                <h1>Student Academic Record &amp; CGPA Computation System</h1>
-                <p>Official institutional database application for managing student enrollments, course evaluations, and calculating semester and cumulative grade point averages.</p>
+            <header class="page-header">
+                <div>
+                    <h1>Student Academic Record &amp; CGPA Computation System</h1>
+                    <p>Official institutional database application for managing student enrollments, course evaluations, semester trajectory analytics, and cumulative grade point averages.</p>
+                </div>
+                <div class="header-actions">
+                    <button type="button" class="btn-primary" onclick="openTranscriptModal()">
+                        Generate Official Transcript
+                    </button>
+                </div>
             </header>
 
             <!-- Student Profile Information -->
@@ -44,6 +54,7 @@
                     <input type="text" id="searchUID" placeholder="Enter Student UID (e.g. 21CS101, 24BEC1440)">
                     <button type="button" id="searchButton" onclick="searchStudent()">Search</button>
                     <button type="button" onclick="clearForm()" class="btn-secondary">New Record</button>
+                    <button type="button" onclick="loadRandomStudent()" class="btn-secondary" title="Populate with generated realistic student record">Load Sample Record</button>
                 </div>
 
                 <div class="student-form">
@@ -71,16 +82,97 @@
                 <div class="stat-card">
                     <h3>Selected Semester SGPA</h3>
                     <p id="sgpa">0.00</p>
+                    <span class="stat-subtext" id="sgpaStatus">Scale: 0.00 to 10.00</span>
                 </div>
 
                 <div class="stat-card">
                     <h3>Overall Cumulative CGPA</h3>
                     <p id="cgpa">0.00</p>
+                    <span class="stat-subtext" id="academicStanding">Standing: Not Evaluated</span>
                 </div>
 
                 <div class="stat-card">
                     <h3>Total Credits Completed</h3>
                     <p id="totalCredits">0</p>
+                    <span class="stat-subtext" id="creditProgressLabel">0 / 160 Degree Credits</span>
+                </div>
+            </section>
+
+            <!-- Visual Analytics Section -->
+            <section class="student-card" id="visual-analytics">
+                <h2>Academic Performance Visual Analytics</h2>
+                <p class="section-desc">
+                    Comprehensive graphical evaluation of academic trajectory across completed semesters, degree completion status, and grade distribution.
+                </p>
+
+                <div class="visual-grid">
+                    <!-- Trajectory Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Semester SGPA Trajectory</h3>
+                            <span class="chart-tag">8-Semester Trend</span>
+                        </div>
+                        <div class="svg-chart-wrapper" id="sgpaChartWrapper">
+                            <svg id="sgpaSvgChart" viewBox="0 0 540 220" class="performance-chart">
+                                <line x1="50" y1="180" x2="510" y2="180" stroke="#cbd5e1" stroke-width="1" />
+                                <text x="280" y="105" text-anchor="middle" fill="#94a3b8" font-size="13">No semester history recorded yet.</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Degree Progress & Classification -->
+                    <div class="visual-card">
+                        <div class="chart-header">
+                            <h3>Degree Completion Progress</h3>
+                            <span class="chart-tag">Credit Audit</span>
+                        </div>
+                        <div class="progress-details">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="creditProgressBar" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-meta">
+                                <span id="creditPercentText">0% Completed</span>
+                                <span id="creditRemainingText">160 Credits Required</span>
+                            </div>
+                        </div>
+
+                        <div class="academic-division">
+                            <h4>Academic Classification Status</h4>
+                            <div class="division-badge" id="divisionBadge">Pending Evaluation</div>
+                            <p class="division-note" id="divisionNote">Complete graded semester courses to establish institutional standing.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Visual Grid: Credit Distribution & Grade Frequency -->
+                <div class="visual-grid-secondary">
+                    <!-- Semester Credit Bar Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Earned Credits per Semester</h3>
+                            <span class="chart-tag">Curriculum Load</span>
+                        </div>
+                        <div class="svg-chart-wrapper">
+                            <svg id="creditBarChart" viewBox="0 0 540 180" class="performance-chart">
+                                <line x1="50" y1="140" x2="510" y2="140" stroke="#cbd5e1" stroke-width="1" />
+                                <text x="280" y="80" text-anchor="middle" fill="#94a3b8" font-size="12">No registered course credits.</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Cumulative Grade Frequency Bar -->
+                    <div class="grade-distribution-container">
+                        <div class="chart-header">
+                            <h3>Cumulative Grade Distribution</h3>
+                            <span class="chart-tag">Letter Grade Frequency</span>
+                        </div>
+                        <div class="distribution-bar" id="gradeDistributionBar">
+                            <div class="dist-empty">No course evaluations registered.</div>
+                        </div>
+                        <div class="distribution-legend" id="gradeLegend">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -106,11 +198,12 @@
                                 <th>Credits</th>
                                 <th>Letter Grade</th>
                                 <th>Grade Point</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="subjectTableBody">
                             <tr>
-                                <td colspan="4" class="text-muted text-center">
+                                <td colspan="5" class="text-muted text-center">
                                     No courses registered for this semester.
                                 </td>
                             </tr>
@@ -122,6 +215,84 @@
                     <button type="button" class="btn-compute" onclick="calculateSGPA()">
                         Compute SGPA and Cumulative CGPA
                     </button>
+                    <button type="button" class="btn-secondary" onclick="populateSemesterCourses()" title="Add standard department courses for this semester">
+                        Load Standard Semester Syllabus
+                    </button>
+                </div>
+            </section>
+
+            <!-- Academic Regulations & Honors Eligibility Audit -->
+            <section class="student-card" id="honors-audit">
+                <h2>Institutional Degree Regulations &amp; Honors Audit</h2>
+                <p class="section-desc">
+                    AICTE and University academic eligibility audit based on active cumulative performance metrics.
+                </p>
+
+                <div class="regulations-grid">
+                    <div class="regulation-item">
+                        <div class="regulation-label">B.Tech Honors Degree Eligibility</div>
+                        <div class="regulation-status" id="honorsStatus">Evaluating...</div>
+                        <div class="regulation-desc">Requires CGPA &ge; 7.50 with zero backlogs and completion of 20 additional advanced credits.</div>
+                    </div>
+                    <div class="regulation-item">
+                        <div class="regulation-label">First Class with Distinction Eligibility</div>
+                        <div class="regulation-status" id="distinctionStatus">Evaluating...</div>
+                        <div class="regulation-desc">Requires CGPA &ge; 8.00 with all registered courses cleared in the initial attempt.</div>
+                    </div>
+                    <div class="regulation-item">
+                        <div class="regulation-label">Academic Standing Threshold</div>
+                        <div class="regulation-status" id="probationStatus">Good Standing</div>
+                        <div class="regulation-desc">Students maintaining CGPA &ge; 5.00 remain in satisfactory institutional standing.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Institutional CGPA to Percentage Converter -->
+            <section class="student-card" id="converter">
+                <h2>Institutional CGPA to Percentage Converter</h2>
+                <p class="section-desc">
+                    Official AICTE and University standard conversion formula: Percentage (%) = CGPA &times; 9.5
+                </p>
+
+                <div class="converter-box">
+                    <div class="converter-input-group">
+                        <label for="converterCgpaInput">Cumulative CGPA:</label>
+                        <input type="number" id="converterCgpaInput" step="0.01" min="0" max="10" value="8.50" oninput="convertCgpaToPercent()">
+                    </div>
+                    <div class="converter-output-group">
+                        <div class="converter-result-label">Calculated Equivalent Percentage:</div>
+                        <div class="converter-result-value" id="converterResult">80.75%</div>
+                    </div>
+                    <div class="converter-output-group">
+                        <div class="converter-result-label">University Equivalent Classification:</div>
+                        <div class="converter-classification-value" id="converterClassification">First Class with Distinction</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Enrolled Student Directory (Multi-Student Database Browser) -->
+            <section class="student-card" id="student-directory">
+                <h2>Enrolled Student Directory</h2>
+                <p class="section-desc">
+                    Institutional database repository of student profiles. Click "Load Record" to inspect academic details.
+                </p>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Student UID</th>
+                                <th>Full Legal Name</th>
+                                <th>Department / Branch</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentDirectoryBody">
+                            <tr>
+                                <td colspan="4" class="text-muted text-center">Loading enrolled directory...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
@@ -135,6 +306,73 @@
 
         </main>
 
+    </div>
+
+    <!-- Official Academic Transcript Modal -->
+    <div class="modal-overlay" id="transcriptModal" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3>Official Academic Grade Sheet Preview</h3>
+                <button type="button" class="btn-close" onclick="closeTranscriptModal()">&times;</button>
+            </div>
+            <div class="transcript-paper" id="transcriptPrintArea">
+                <div class="transcript-header">
+                    <h2>OFFICE OF THE CONTROLLER OF EXAMINATIONS</h2>
+                    <h3>AUTONOMOUS INSTITUTIONAL UNIVERSITY</h3>
+                    <p class="transcript-subtitle">OFFICIAL CONSOLIDATED GRADE SHEET</p>
+                </div>
+
+                <div class="transcript-meta-grid">
+                    <div><strong>Student Full Name:</strong> <span id="transName">-</span></div>
+                    <div><strong>University ID (UID):</strong> <span id="transUID">-</span></div>
+                    <div><strong>Department / Branch:</strong> <span id="transBranch">-</span></div>
+                    <div><strong>Academic Standing:</strong> <span id="transStanding">-</span></div>
+                </div>
+
+                <div id="transcriptSemestersContainer">
+                    <!-- Populated dynamically with course breakdown -->
+                </div>
+
+                <div class="transcript-summary-box">
+                    <div class="trans-metric">
+                        <span class="trans-metric-label">Total Completed Credits</span>
+                        <span class="trans-metric-val" id="transTotalCredits">0</span>
+                    </div>
+                    <div class="trans-metric">
+                        <span class="trans-metric-label">Cumulative Grade Point Average</span>
+                        <span class="trans-metric-val" id="transCGPA">0.00</span>
+                    </div>
+                    <div class="trans-metric">
+                        <span class="trans-metric-label">Equivalent Percentage</span>
+                        <span class="trans-metric-val" id="transPercent">0.00%</span>
+                    </div>
+                    <div class="trans-metric">
+                        <span class="trans-metric-label">Final Division</span>
+                        <span class="trans-metric-val" id="transDivision">Pass</span>
+                    </div>
+                </div>
+
+                <div class="transcript-signature-row">
+                    <div class="sig-block">
+                        <div class="sig-line"></div>
+                        <span>Prepared By (Data Entry)</span>
+                    </div>
+                    <div class="sig-block">
+                        <div class="sig-line"></div>
+                        <span>Dean of Academic Affairs</span>
+                    </div>
+                    <div class="sig-block">
+                        <div class="sig-line"></div>
+                        <span>Controller of Examinations</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeTranscriptModal()">Close</button>
+                <button type="button" class="btn-primary" onclick="window.print()">Print Official Transcript</button>
+            </div>
+        </div>
     </div>
 
     <script src="/script.js"></script>

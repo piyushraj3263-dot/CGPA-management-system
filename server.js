@@ -30,7 +30,7 @@ app.get("/terms", (req, res) => res.sendFile(path.join(__dirname, "terms.html"))
 // ---------------------------------------------------------------------
 // DATABASE CONTROLLER (Oracle with Automatic SQLite Fallback)
 // ---------------------------------------------------------------------
-const SQLITE_FILE = path.join(__dirname, "cgpa_local.db");
+const SQLITE_FILE = process.env.VERCEL ? path.join("/tmp", "cgpa_local.db") : path.join(__dirname, "cgpa_local.db");
 let localDb = null;
 let useOracle = false;
 
@@ -69,7 +69,7 @@ function initLocalDatabase() {
             FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
             FOREIGN KEY (semester_id) REFERENCES semesters(semester_id) ON DELETE CASCADE,
             FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE,
-            UNIQUE(student_id, semester_number, subject_id)
+            UNIQUE(student_id, semester_id, subject_id)
         );
     `);
 
@@ -724,9 +724,15 @@ async function start() {
         console.log(`🎓 CGPA MANAGEMENT SYSTEM (v2.0) IS RUNNING`);
         console.log(`🚀 Open browser at: http://localhost:${PORT}`);
         console.log(`💾 Active Database Mode: ${useOracle ? "Oracle Cloud Database" : "Local SQLite (cgpa_local.db)"}`);
-        console.log(`💡 NOTE: Any random student, semester, and subjects can now be saved!`);
         console.log(`================================================================`);
     });
 }
 
-start();
+if (!process.env.VERCEL) {
+    start();
+} else {
+    initLocalDatabase();
+    checkOracleConnection().then(ok => { useOracle = ok; });
+}
+
+module.exports = app;

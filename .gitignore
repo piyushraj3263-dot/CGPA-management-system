@@ -15,6 +15,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Runtime data & SQLite caches
+*.db
 *.db-journal
 *.db-wal
 *.db-shm
